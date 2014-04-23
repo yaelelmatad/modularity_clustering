@@ -1,5 +1,5 @@
 #Modularity Clustering#
-This tool set includes a version of modularity clustering algorithm by Newman Phys Rev E 69, 066133
+A version of modularity clustering algorithm by Newman Phys Rev E 69, 066133
 
 To run it via python import it as a module:
 ```python

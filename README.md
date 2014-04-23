@@ -1,16 +1,16 @@
 #Modularity Clustering#
 A version of modularity clustering algorithm by Newman Phys Rev E 69, 066133
 
-To run it via python import it as a module:
+To run it via python import it as a module (you'll want to make sure the correct folder is in your sys.path):
 ```python
 from modularityClustering import modCluster
 ```
 
 See file:
 ```bash
-exampleModularityClustering.py
+examples/exampleModularityClustering.py
 ```
-For more information see comments in ```exmapleModularityClustering.py```.
+For more information see comments in ```examples/exmapleModularityClustering.py``` .
 
 Output will be of three types: 
   1.  A JSON file which includes the different clusters and the modularity values for each cluster. 

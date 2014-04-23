@@ -73,7 +73,7 @@ Here's a good example of how to use the module:
 ```python
 from modularityClustering import modCluster
 mc = modCluster()
-mc.loadEdges("karate.csv",symmetric=True)
+mc.loadEdges("karate.csv")
 mc.findCommunities()
 mc.printClustersJSON("karate.json")
 ```

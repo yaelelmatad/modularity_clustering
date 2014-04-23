@@ -44,9 +44,11 @@ def main():
 
     jsonFN = rootFN + ".json"
     gnuFN = rootFN + ".tsv"
+    MRFN = rootFN + ".MR"
 
     mc.printClustersJSON(outputFile=jsonFN)
     mc.printgnu(filename=gnuFN)
+    mc.printMR(outputFile=MRFN)
 
 if __name__ == '__main__':
     main()

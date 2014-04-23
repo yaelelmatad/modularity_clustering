@@ -1,5 +1,6 @@
 #Modularity Clustering#
-A version of modularity clustering algorithm by Newman Phys Rev E 69, 066133
+A version of modularity clustering algorithm by Newman Phys Rev E 69, 066133 PDF Here: 
+http://arxiv.org/pdf/cond-mat/0309508.pdf
 
 To run it via python import it as a module (you'll want to make sure the correct folder is in your ```sys.path```):
 ```python

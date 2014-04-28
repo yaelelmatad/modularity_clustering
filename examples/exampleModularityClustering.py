@@ -21,8 +21,8 @@ Example useage of modularityClustering.  To run pleae try:
 #================================
 #Imports
 import sys
-sys.path.append('../src/')
-from modularityClustering import modCluster
+sys.path.append('../src')
+from modularityClustering.modularityClustering import modCluster
 #================================
 
 

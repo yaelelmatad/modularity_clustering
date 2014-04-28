@@ -111,9 +111,8 @@ class modCluster(object):
                 weight = float(row[2]) 
                 self.edgeData[(n1,n2)]=weight
                 self.originalData[(n1,n2)]=weight
-                if symmetric: #if the data is symmetric then edge(i,j)=edge(j,i)
-                    self.edgeData[(n2,n1)]=weight
-                    self.originalData[(n2,n1)]=weight #let's keep the original data around, mmkay?
+                self.edgeData[(n2,n1)]=weight
+                self.originalData[(n2,n1)]=weight #let's keep the original data around, mmkay?
                 self.nodes.add(n1)
                 self.nodes.add(n2)
 
@@ -130,12 +129,6 @@ class modCluster(object):
         for n1 in self.nodes:
             for n2 in self.nodes:
                 if n1 != n2:
-                    #if not self.edgeData.has_key((n1,n2)):
-                    #    self.edgeData[(n1,n2)]=0.0
-                    #if self.symmetric:
-                    #    factor = 0.5 #make sure we don't double weight edges
-                    #else:
-                    #    factor = 1.0 #not sure if this should still be 0.5 if not symmetric.  WATCH THIS CAREFULLY
                     if self.edgeData.has_key((n1,n2)):
                         self.totalEdges += factor*self.edgeData[(n1,n2)]
 
@@ -145,13 +138,12 @@ class modCluster(object):
 
         for key in self.edgeData: #reweight by total value
             self.edgeData[key] = self.edgeData[key]/self.totalEdges
-        
 
         self.nNodes = len(self.nodes)
         #now we set up the current communities with nNodes number of communities
         self.setUpCommunity()
         if self.verbose:
-            print "All done setting up, now call findCommunities(stopAtFirstNegativeDelatQ=BOOL)"
+            print "All done setting up, now call findCommunities(stopAtFirstNegativeDeltaQ=BOOL)"
 
     def printClustersJSON(self,outputFile="communities.json"):
         '''prints community data in pretty json format'''
@@ -208,16 +200,29 @@ class modCluster(object):
         deltaQ, (i,j) = self.findNextPair()
         self.joinNextPair(i,j)
         self.currQValue+=deltaQ
-        if deltaQ < 0 and self.stopAtNegativeDeltaQ:
-            self.isDone = True
         #self.computeQ()
         if self.currQValue > self.maxQValue:
             self.maxQValue = self.currQValue
             self.maxQValueCommData = dcopy(self.currCommunityData)
+        if deltaQ < 0 and self.stopAtNegativeDeltaQ:
+            self.isDone = True
+            self.updateMaxMembership()
+            if self.verbose:
+                print "DONE: Max Q value found:", self.maxQValue            
+                print "If you want to print the output please call: printClustersJSON(outputFile=\"communities.json\")"
+                print "For convenient printing with gnuplot please call: printgnu(filename=\"gnuOut.dat\") (plot w/ 'u 3:4:5')"
+                print "For using with network analysis (MR) call: printMR(outputFile=\"MR_output.dat\")"
+                print "This is the Q path starting from the first Q computed (all separated)"
+                for elem in self.QPath:
+                    if self.maxQValue > elem - self.tiny and self.maxQValue < elem + self.tiny:
+                        print elem, "MAX"
+                    else:
+                        print elem
+            return
 
 
 
-    def findCommunities(self,stopAtFirstNegativeDeltaQ = False):
+    def findCommunities(self,stopAtFirstNegativeDeltaQ = True):
         self.stopAtNegativeDeltaQ = stopAtFirstNegativeDeltaQ
         '''call this routine to actually do the loop'''
         i = 0
@@ -249,8 +254,9 @@ class modCluster(object):
 
         keysToUpdate = set()
         for comm in self.comparableCommunities: #HERE: Is a good place for imporovemnt.  When we combine memberships maybe we only need to do it for nonzero values?
+
             if comm != i and comm !=j:
-                if comm in self.currCommunityData[i]["e"] or comm in self.currCommunityData[j]["e"]:
+                if self.currCommunityData[i]["e"].has_key(comm) or self.currCommunityData[j]["e"].has_key(comm) or self.currCommunityData[comm]["e"].has_key(j) or self.currCommunityData[comm]["e"].has_key(i):
                     if comm < i:
                         keysToUpdate.add((comm,i))
                     else:
@@ -366,7 +372,6 @@ class modCluster(object):
         
         self.setUpEs()
         self.setUpQ()
-        json.dumps(self.currCommunityData,indent=4)
 
 
     def computeQ(self):
@@ -399,11 +404,7 @@ class modCluster(object):
                                 print "something has gone horribly wrong, something is a member of two communities at once!"
                                 print "c1: ", c1, "c2:", c2, "member: ", m1
                             elif (m1,m2) in self.edgeData:
-                                if self.symmetric: #treat symm diff
-                                    self.currCommunityData[c1]["e"][c2]+=self.edgeData[(m1,m2)]*0.5
-                                else: #need to test if this works properly!
-                                    self.currCommunityData[c1]["e"][c2]+=self.edgeData[(m1,m2)]*0.5 
-                                    #turned this into 0.5 with the idea that it will average out asymetric nodes.  This is basically how the algorithm would have interpretted these things anyway.
+                                self.currCommunityData[c1]["e"][c2]+=self.edgeData[(m1,m2)]*0.5
                                 self.currCommunityData[c1]["a"]+=self.currCommunityData[c1]["e"][c2]
 
         for c1 in self.currCommunityData:

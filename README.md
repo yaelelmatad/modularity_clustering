@@ -5,7 +5,7 @@ http://arxiv.org/pdf/cond-mat/0309508.pdf
 
 To run it via python import it as a module (you'll want to make sure the correct folder is in your ```sys.path```):
 ```python
-from modularityClustering import modCluster
+from modularity_clustering import modularity_cluster
 ```
 
 See file:
@@ -73,8 +73,8 @@ This is the famous "Zachary's Karate Club" data from 1977.
 Here's a good example of how to use the module:
 
 ```python
-from modularityClustering import modCluster
-mc = modCluster()
+from modularity_clustering import modularity_cluster
+mc = modularity_cluster()
 mc.loadEdges("karate.csv")
 mc.findCommunities()
 mc.printClustersJSON("karate.json")

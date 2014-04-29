@@ -22,7 +22,7 @@ Example useage of modularityClustering.  To run pleae try:
 #Imports
 import sys
 sys.path.append('../src')
-from modularityClustering.modularityClustering import modCluster
+from modularity_clustering import modularity_cluster
 #================================
 
 
@@ -36,10 +36,10 @@ def main():
         sys.exit(1)
 
     inputfile = sys.argv[1]
-    mc = modCluster(verbose=True)
-    mc.loadEdges(sys.argv[1], ignoreHeader=True)
+    mc = modularity_cluster(verbose=True)
+    mc.loadEdges(inputfile, ignoreHeader=False)
 
-    mc.findCommunities(stopAtFirstNegativeDeltaQ=True)
+    mc.findCommunities(stopAtFirstNegativeDeltaQ=False)
    
     rootFN = sys.argv[2]
 

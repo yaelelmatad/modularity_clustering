@@ -3,7 +3,7 @@
 ------------------------------------------------
 File Information:
 
-@file = modularityClustering.py
+@file = modularity_clustering.py
 @author: Yael Elmatad
 @email: yael.elmatad@tapad.com
 @date: <date>
@@ -38,7 +38,7 @@ from sets import Set
 
 #================================
 #Classes
-class modCluster(object):
+class modularity_cluster(object):
     '''modality clustering for simple weighted matrices'''
 
     def __init__(self, verbose=True):
@@ -56,11 +56,10 @@ class modCluster(object):
         self.header = ""                        #if hte CSV has a header, it will be stored here
         self.isDone = False                     #checks if the algorithm is done doing it's thing
         self.originalData = {}                  #the original, unreweighted data
-        self.symmetric=False                    #is the data 'symmetric' ie the weight of edge i->j same as j->i
         self.totalEdges = 0                     #sum of all edges and their weights.
         self.pp = pprint.PrettyPrinter(indent=4) #no one likes to look at gross dictionaries, make them look pretty
         if self.verbose:
-            print "All done initiating, please call modCluster.loadEdges(filename(CSV!), ignoreHeader=BOOL, symmetric=BOOL) now to load a CSV"
+            print "All done initiating, please call modularity_cluster.loadEdges(filename(CSV!), ignoreHeader=BOOL) now to load a CSV"
         self.currMembership = {}                #holds current round membership data
         self.membership={} #                    #holds max("true") membership data
         self.QPath = []                         #holds the history of Q values
@@ -93,12 +92,10 @@ class modCluster(object):
         else:
             return False
 
-    def loadEdges(self,fn,ignoreHeader = False, symmetric=False):
+    def loadEdges(self,fn,ignoreHeader = False):
         '''takes a filename and reads it in'''
         '''file format: CSV: node1, node2, weight'''
         '''send ignoreHeader=True if want to ignore first line)'''
-        '''send symmetric=True if the edge strenghts are not unidirectional'''
-        self.symmetric=symmetric
         loadFile=open(fn,'rb')
         inputCSV=csv.reader(loadFile, skipinitialspace=True, dialect = "excel")
         if (ignoreHeader):
@@ -132,8 +129,11 @@ class modCluster(object):
                     if self.edgeData.has_key((n1,n2)):
                         self.totalEdges += factor*self.edgeData[(n1,n2)]
 
-        for n1,n2 in self.edgeData:
-            print n1,n2,self.edgeData[(n1,n2)]
+
+        if self.verbose:
+            print "node1, node2, weight"
+            for n1,n2 in self.edgeData:
+                print n1,n2,self.edgeData[(n1,n2)]
 
 
         for key in self.edgeData: #reweight by total value
@@ -173,8 +173,6 @@ class modCluster(object):
                 oF.write(toPrint)
 
         oF.close()
-
-        
 
     def findJoinAndUpdateQ(self):
         '''this method goes through one pass of algorithm and combines two communities together'''
@@ -220,8 +218,6 @@ class modCluster(object):
                         print elem
             return
 
-
-
     def findCommunities(self,stopAtFirstNegativeDeltaQ = True):
         self.stopAtNegativeDeltaQ = stopAtFirstNegativeDeltaQ
         '''call this routine to actually do the loop'''
@@ -232,7 +228,6 @@ class modCluster(object):
                 print "Clustering Pass", i
             self.findJoinAndUpdateQ()
             self.QPath.append(self.currQValue)
-
 
     def joinNextPair(self,i,j):
         '''this routine joins two community clusters i and j'''
@@ -303,16 +298,6 @@ class modCluster(object):
                 if j in self.deltaQs[key1]:
                     del self.deltaQs[key1][j]
 
-
-
-
-
-
-
-
-
-    
-
     def findNextPair(self):
         '''goes through the data and finds the next pair to join that maximizes deltaQ'''
         if len(self.currCommunityData)==1 or len(self.comparableCommunities)==0:
@@ -335,25 +320,6 @@ class modCluster(object):
         (key1,key2),deltaQ = max(maxs.items(), key=lambda x: x[1])
         currMax = deltaQ
         return deltaQ, (key1,key2)
-
-
-        #
-        #for c1 in self.comparableCommunities:
-        #    for c2 in self.comparableCommunities:
-        #        if c1 != c2:
-        #            if (c1,c2) not in seenPairs:
-        #                seenPairs.add((c1,c2))
-        #                seenPairs.add((c2,c1))
-        #                #deltaQ =eij+eji-2*aj*ai
-        #                self.deltaQs[c1][c2] = deltaQ
-        #                self.deltaQs[c2][c1] = deltaQ
-        #                if currMax < deltaQ or firstPass:
-        #                    currMax = deltaQ
-        #                    currJoin = (c1,c2)
-        #                    firstPass = False
-
-        #deltaQ = currMax #for transparancy
-        #return deltaQ, currJoin
         
     def setUpCommunity(self):
         '''initialize every node to be it's own community island and empty out all values'''
@@ -373,13 +339,11 @@ class modCluster(object):
         self.setUpEs()
         self.setUpQ()
 
-
     def computeQ(self):
         #computes value of Q
         self.currQValue = 0
         for c1 in self.currCommunityData:
             self.currQValue+=(self.currCommunityData[c1]["e"][c1]-self.currCommunityData[c1]["a"]**2)
-
 
     def setUpQ(self):
         '''for first pass, compute Q'''
@@ -388,8 +352,6 @@ class modCluster(object):
         self.maxQValue= self.currQValue
         self.maxQValueCommData = dcopy(self.currCommunityData)
         #self.pp.pprint(self.maxQValueCommData)
-
-
 
     def setUpEs(self):
         '''loops over all edges to set up nNodes number of single component communities to initialize algorithm'''
@@ -418,7 +380,6 @@ class modCluster(object):
         
         #if you want to see all went well
         #self.pp.pprint(self.currCommunityData)
-
 
     def printAllMembers(self,filename="allRemainingMembers.dat"):
         '''useful after self.removeLargerClusters to print remaining members in a list'''

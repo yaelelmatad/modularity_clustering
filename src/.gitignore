@@ -1,0 +1,6 @@
+*.pyc
+*.json
+*.csv
+!examples/karate.csv
+*.dat
+*.tsv

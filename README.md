@@ -3,6 +3,8 @@ A version of modularity clustering algorithm by Newman Phys Rev E 69, 066133 PDF
 
 http://arxiv.org/pdf/cond-mat/0309508.pdf
 
+Small presentation going over the algorithm/use case is in the folder ```presentations```. Presented at Data Rave April 2014.
+
 To run it via python import it as a module (you'll want to make sure the correct folder is in your ```sys.path```):
 ```python
 from modularity_clustering import modularity_cluster
